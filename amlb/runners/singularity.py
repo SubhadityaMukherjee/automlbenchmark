@@ -138,7 +138,7 @@ class SingularityBenchmark(ContainerBenchmark):
     def _run_container_build_command(self, image, cache):
         log.info(f"Building singularity image {image}.")
         run_cmd(
-            "sudo singularity build {options} {container} {script}".format(
+            "singularity build {options} {container} {script}".format(
                 options="" if cache else "--disable-cache",
                 container=image,
                 script=self._script,
