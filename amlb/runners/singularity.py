@@ -206,7 +206,6 @@ $PY {script} {framework} -s only
 {custom_commands}
 
 %environment
-export DEBIAN_FRONTEND=noninteractive
 export SPIP=python{pyv} -m pip
 export SPY=python{pyv}
 export PYTHONUTF8=1
