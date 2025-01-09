@@ -163,7 +163,7 @@ From: ubuntu:22.04
 . /bench/
 %post
 
-DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get -y install apt-utils dialog locales
 apt-get -y install curl wget unzip git

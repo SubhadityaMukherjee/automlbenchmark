@@ -1,3 +1,4 @@
+PROTECTED_C = False
 import json
 import logging
 import math
