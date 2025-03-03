@@ -13,11 +13,13 @@ log = logging.getLogger(__name__)
 def run(dataset, config):
     log.info("\n**** FEDOT ****\n")
 
-    is_classification = config.type == 'classification'
+    is_classification = config.type == "classification"
     scoring_metric = get_fedot_metrics(config)
 
     training_params = {"preset": "best_quality", "n_jobs": config.cores}
-    training_params.update({k: v for k, v in config.framework_params.items() if not k.startswith('_')})
+    training_params.update(
+        {k: v for k, v in config.framework_params.items() if not k.startswith("_")}
+    )
     n_jobs = training_params["n_jobs"]
 
     log.info(f"Running FEDOT with a maximum time of {config.max_runtime_seconds}s on {n_jobs} cores, \
@@ -40,11 +42,11 @@ def run(dataset, config):
     log.info("Predicting on the test set.")
     with Timer() as predict:
         predictions = fedot.predict(features=dataset.test.X)
-        probabilities = None
-        if is_classification:
-            probabilities = fedot.predict_proba(
-                features=dataset.test.X, probs_for_all_classes=True
-            )
+    probabilities = None
+    if is_classification:
+        probabilities = fedot.predict_proba(
+            features=dataset.test.X, probs_for_all_classes=True
+        )
 
     save_artifacts(fedot, config)
 
@@ -62,15 +64,15 @@ def run(dataset, config):
 
 def get_fedot_metrics(config):
     metrics_mapping = dict(
-        acc='accuracy',
-        auc='roc_auc',
-        f1='f1',
-        logloss='neg_log_loss',
-        mae='mae',
-        mse='mse',
-        msle='msle',
-        r2='r2',
-        rmse='rmse',
+        acc="accuracy",
+        auc="roc_auc",
+        f1="f1",
+        logloss="neg_log_loss",
+        mae="mae",
+        mse="mse",
+        msle="msle",
+        r2="r2",
+        rmse="rmse",
     )
     scoring_metric = metrics_mapping.get(config.metric, None)
 
