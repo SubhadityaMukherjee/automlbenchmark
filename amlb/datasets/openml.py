@@ -114,7 +114,7 @@ class OpenmlDataset(Dataset):
                 return DatasetType.multiclass
             elif card == 2:
                 return DatasetType.binary
-            elif card == 0:
+            elif card == 0 or card is None:
                 return DatasetType.regression
             return None
 

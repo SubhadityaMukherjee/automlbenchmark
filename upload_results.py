@@ -151,7 +151,7 @@ def upload_task(task_directory: pathlib.Path) -> Optional[OpenMLRun]:
             return run
     except Exception as e:
         message = e.message if hasattr(e, "message") else e.args[0]
-        log.warning("Task %s failed to upload: %s" % (task_name, message))
+        log.warning("Task %s failed to upload: %s" % (task_name, e))
         if args.fail_fast:
             raise
 

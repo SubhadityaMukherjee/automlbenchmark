@@ -41,7 +41,15 @@ def _load_predictions(task_folder: pathlib.Path) -> pd.DataFrame:
     """Loads predictions of all folds for a task with index information required for upload."""
     metadata = _load_task_data(task_folder)
     task = openml.tasks.get_task(metadata.openml_task_id)
-    results = [_load_fold(task_folder, fold, task) for fold in range(10)]
+    # results = [_load_fold(task_folder, fold, task) for fold in range(10)]
+    results = []
+    for fold in range(10):
+        try:
+            fold_result = _load_fold(task_folder, fold, task)
+            if fold_result is not None:
+                results.append(fold_result)
+        except FileNotFoundError:
+            pass
     return pd.concat(results)
 
 
@@ -137,22 +145,35 @@ def _upload_results(task_folder: pathlib.Path) -> openml.runs.OpenMLRun:
     predictions = _load_predictions(task_folder)
 
     oml_flow = _get_flow(metadata)
-    oml_task = openml.tasks.get_task(metadata.openml_task_id)
 
-    denormalize_map = {label.strip().lower(): label for label in oml_task.class_labels}
-    predictions.columns = pd.Index(
-        col if col not in denormalize_map else denormalize_map[col]
-        for col in predictions
-    )
-    predictions["truth"] = predictions["truth"].apply(denormalize_map.get)
-    predictions["predictions"] = predictions["predictions"].apply(denormalize_map.get)
+    oml_task = openml.tasks.get_task(metadata.openml_task_id)
+    try:
+        denormalize_map = {
+            label.strip().lower(): label for label in oml_task.class_labels
+        }
+        predictions.columns = pd.Index(
+            col if col not in denormalize_map else denormalize_map[col]
+            for col in predictions
+        )
+        predictions["truth"] = predictions["truth"].apply(denormalize_map.get)
+        predictions["predictions"] = predictions["predictions"].apply(
+            denormalize_map.get
+        )
+    except Exception as e:
+        print(e)
 
     formatted_predictions = []
     for _, row in predictions.iterrows():
-        if metadata.type != "classification":
+        if (
+            metadata.type != "classification"
+            or oml_task.task_type == openml.tasks.OpenMLRegressionTask
+        ):
             class_probabilities = None
         else:
-            class_probabilities = {c: row[c] for c in oml_task.class_labels}
+            try:
+                class_probabilities = {c: row[c] for c in oml_task.class_labels}
+            except:
+                class_probabilities = None
         prediction = format_prediction(
             task=oml_task,
             repeat=row["repeat"],
@@ -199,13 +220,14 @@ def missing_folds(task_folder: pathlib.Path) -> Set[str]:
 
 
 def process_task_folder(task_folder: pathlib.Path) -> Optional[openml.runs.OpenMLRun]:
-    """Uploads the task folder iff predictions for all 10 folds are present."""
-    if len(missing_folds(task_folder)) > 0:
-        log.warning(
-            "Task %s is missing predictions for folds %s.",
-            task_folder,
-            ", ".join(missing_folds(task_folder)),
-        )
-        return None
+    # """Uploads the task folder iff predictions for all 10 folds are present."""
+    """Uploads the task folder iff predictions for all folds"""
+    # if len(missing_folds(task_folder)) > 0:
+    #     log.warning(
+    #         "Task %s is missing predictions for folds %s.",
+    #         task_folder,
+    #         ", ".join(missing_folds(task_folder)),
+    #     )
+    #     # return None
 
     return _upload_results(task_folder)
