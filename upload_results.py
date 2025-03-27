@@ -174,7 +174,7 @@ def process_results(result_dir: pathlib.Path, mode: str = "check"):
         folds = missing_folds(full_task_directory)
         if len(folds) > 0:
             log.info("%s has missing folds: %s" % (task_name, ", ".join(sorted(folds))))
-            continue
+            # continue
 
         metadata = _load_task_data(full_task_directory)
         if "openml_task_id" not in metadata:
