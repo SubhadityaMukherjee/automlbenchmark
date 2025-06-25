@@ -5,11 +5,11 @@ This script can be used to build all/selected docker/singularity images.
     python build_images.py -m docker
     python build_images.py -m singularity
 
-2. To delete files forcefully, add the --force flag. This is optional but recommended in
-case you change something. python build_images.py -m singularity --force
+2. To delete files forcefully, add the --force flag. This is optional but recommended in case you change something.
+    python build_images.py -m singularity --force
 
-3. To specify frameworks, use the -f flag with a comma-separated list: python
-build_images.py -m docker -f autosklearn,flaml,gama --force
+3. To specify frameworks, use the -f flag with a comma-separated list:
+    python build_images.py -m docker -f autosklearn,flaml,gama --force
 
 4. If no frameworks are specified, the script will act on all available frameworks.
 
